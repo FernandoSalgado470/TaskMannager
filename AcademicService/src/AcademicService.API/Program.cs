@@ -21,6 +21,10 @@ builder.Services.AddScoped<ITeacherSubjectGroupRepository, TeacherSubjectGroupRe
 builder.Services.AddScoped<IStudentGroupRepository, StudentGroupRepository>();
 builder.Services.AddScoped<IParentStudentRepository, ParentStudentRepository>();
 
+// 🎯 LÍNEA AÑADIDA: Registrar el Repositorio de Estudiantes
+builder.Services.AddScoped<IStudentRepository, StudentRepository>(); 
+// Asumimos que la clase concreta se llama StudentRepository y existe en la capa Infrastructure.
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -69,8 +73,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", builder =>
     {
         builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+                .AllowAnyMethod()
+                .AllowAnyHeader();
     });
 });
 

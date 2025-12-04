@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AcademicService.Application\AcademicService.Application.csproj" />
     <ProjectReference Include="..\AcademicService.Infrastructure\AcademicService.Infrastructure.csproj" />
+    <ProjectReference Include="..\AcademicService.Domain\AcademicService.Domain.csproj" />
   </ItemGroup>
 
 </Project>

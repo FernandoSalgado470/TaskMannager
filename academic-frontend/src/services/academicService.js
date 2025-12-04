@@ -84,6 +84,21 @@ const academicService = {
     return response.data;
   },
 
+  // STUDENTS
+ getAllStudents: async () => {
+    const response = await academicServiceAPI.get('/students');
+    return response.data.data; 
+  },
+
+  getStudentById: async (id) => {
+    const response = await academicServiceAPI.get(`/students/${id}`);
+    return response.data;
+  },
+
+  createStudent: async (studentData) => {
+    const response = await academicServiceAPI.post('/students', studentData);
+    return response.data;
+  },
   // STUDENT ENROLLMENTS
   getAllEnrollments: async () => {
     const response = await academicServiceAPI.get('/student-enrollments');
