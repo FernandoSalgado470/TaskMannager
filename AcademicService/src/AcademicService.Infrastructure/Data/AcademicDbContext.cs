@@ -12,9 +12,10 @@ namespace AcademicService.Infrastructure.Data
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
-        public DbSet<TeacherSubjectGroup> TeacherSubjectGroups { get; set; }
         public DbSet<StudentGroup> StudentGroups { get; set; }
         public DbSet<ParentStudent> ParentStudents { get; set; }
+        public DbSet<Student> Students { get; set; } 
+        public DbSet<TeacherSubjectGroup> TeacherSubjectGroups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
