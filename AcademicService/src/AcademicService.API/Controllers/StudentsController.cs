@@ -1,78 +1,100 @@
 using AcademicService.Application.DTOs;
 using AcademicService.Domain.Entities;
-using AcademicService.Domain.Interfaces; // <-- Este using es vital
+using AcademicService.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace AcademicService.API.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/students")] // <-- URL correcta
-    [Produces("application/json")]
     public class StudentsController : ControllerBase
     {
-        // Usar la interfaz IStudentRepository, no IStudentService
-        private readonly IStudentRepository _repository; 
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentsController(IStudentRepository repository)
+        public StudentsController(IStudentRepository studentRepository)
         {
-            _repository = repository;
+            _studentRepository = studentRepository;
         }
 
-        /// <summary>
-        /// Obtiene todos los estudiantes
-        /// </summary>
-        [HttpGet]
-        public async Task<ActionResult<ApiResponse<IEnumerable<StudentDto>>>> GetAll()
+        // --- Obtener estudiante por ID ---
+        [HttpGet("{id:int}", Name = "GetStudentById")]
+        [ProducesResponseType(typeof(StudentDto), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetStudentById(int id)
         {
-            var students = await _repository.GetAllAsync();
-            var dtos = students.Select(MapToDto);
+            var student = await _studentRepository.GetByIdAsync(id);
+            if (student == null) return NotFound();
 
-            return Ok(ApiResponse<IEnumerable<StudentDto>>.SuccessResponse(dtos));
-        }
-
-        /// <summary>
-        /// Crea un nuevo estudiante
-        /// </summary>
-        [HttpPost]
-        public async Task<ActionResult<ApiResponse<StudentDto>>> Create([FromBody] CreateStudentDto dto)
-        {
-            var student = new Student
-            {
-                FirstName = dto.FirstName, // Asegúrate que CreateStudentDto tenga estas propiedades
-                LastName = dto.LastName,
-                Email = dto.Email,
-                IsActive = true // Asumimos que IsActive es un campo del modelo de Estudiante
-            };
-
-            var created = await _repository.CreateAsync(student);
-
-            return CreatedAtAction(nameof(GetById), new { id = created.Id },
-                ApiResponse<StudentDto>.SuccessResponse(MapToDto(created), "Estudiante creado exitosamente"));
-        }
-
-        // --- MÉTODOS DE SOPORTE ---
-        // (Debes tener un método GetById, Put, Delete, etc., similares a los del controlador de matrícula)
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse<StudentDto>>> GetById(int id)
-        {
-             var student = await _repository.GetByIdAsync(id);
-             if (student == null)
-                 return NotFound(ApiResponse<StudentDto>.ErrorResponse("Estudiante no encontrado"));
-             return Ok(ApiResponse<StudentDto>.SuccessResponse(MapToDto(student)));
-        }
-
-        private static StudentDto MapToDto(Student student)
-        {
-            // Crea esta clase en Application/DTOs/StudentDto.cs
-            return new StudentDto 
+            var studentDto = new StudentDto
             {
                 Id = student.Id,
                 FirstName = student.FirstName,
                 LastName = student.LastName,
                 Email = student.Email,
-                IsActive = student.IsActive
+                IsActive = student.IsActive,
+                CreatedDate = student.CreatedDate
             };
+
+            return Ok(studentDto);
+        }
+
+        // --- Crear estudiante ---
+        [HttpPost]
+        [ProducesResponseType(typeof(StudentDto), 201)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> CreateStudent([FromBody] CreateStudentDto studentDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                // Validación de nombres y apellidos (solo letras, espacios y guiones)
+                if (!Regex.IsMatch(studentDto.FirstName, @"^[a-zA-Z\s-]+$"))
+                    throw new Exception("El nombre solo puede contener letras, espacios o guiones.");
+                if (!Regex.IsMatch(studentDto.LastName, @"^[a-zA-Z\s-]+$"))
+                    throw new Exception("El apellido solo puede contener letras, espacios o guiones.");
+
+                // Validación de email duplicado
+                bool emailExists = await _studentRepository.EmailExistsAsync(studentDto.Email);
+                if (emailExists)
+                    throw new Exception($"El correo '{studentDto.Email}' ya está registrado.");
+
+                // Mapear DTO a entidad
+                var student = new Student
+                {
+                    FirstName = studentDto.FirstName,
+                    LastName = studentDto.LastName,
+                    Email = studentDto.Email,
+                    IsActive = true,
+                    CreatedDate = DateTime.UtcNow
+                };
+
+                // Guardar en la base de datos
+                await _studentRepository.AddAsync(student);
+
+                // Mapear entidad a DTO para respuesta
+                var studentToReturn = new StudentDto
+                {
+                    Id = student.Id,
+                    FirstName = student.FirstName,
+                    LastName = student.LastName,
+                    Email = student.Email,
+                    IsActive = student.IsActive,
+                    CreatedDate = student.CreatedDate
+                };
+
+                // Devolver 201 Created con el DTO
+                return CreatedAtAction(nameof(GetStudentById), new { id = studentToReturn.Id }, studentToReturn);
+            }
+            catch (Exception ex)
+            {
+                // Devuelve JSON con error
+                return BadRequest(new { error = ex.Message });
+            }
         }
     }
 }

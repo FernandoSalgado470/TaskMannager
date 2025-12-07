@@ -7,5 +7,6 @@ namespace AcademicService.Domain.Entities
         public required string LastName { get; set; }  // Añadir required
         public required string Email { get; set; }    // Añadir required
         public bool IsActive { get; set; }
+        public DateTime CreatedDate { get; set; } 
     }
 }

@@ -49,6 +49,19 @@ const Navbar = () => {
           }}>
             Grupos
           </Link>
+          
+          {/* 🎯 NUEVO ENLACE AÑADIDO */}
+          <Link to="/students/register" style={{ 
+            color: 'white', 
+            textDecoration: 'none',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.5rem',
+            backgroundColor: '#1E40AF', // Color ligeramente diferente para destacar el botón
+            fontWeight: 'bold'
+          }}>
+            Matricular Estudiante
+          </Link>
+          
         </div>
       </div>
     </nav>
