@@ -22,12 +22,25 @@ const Students = () => {
     try {
       setLoading(true);
       const response = await userService.getAllUsers();
-      if (response.success) {
+      console.log('Response from UserService:', response);
+
+      // Check if response has success property
+      if (response && response.success) {
+        setStudents(response.data || []);
+      } else if (response && Array.isArray(response.data)) {
+        // Some APIs return data directly in response.data
         setStudents(response.data);
+      } else if (Array.isArray(response)) {
+        // Or data might be the response itself
+        setStudents(response);
+      } else {
+        console.error('Unexpected response format:', response);
+        setStudents([]);
       }
     } catch (error) {
       console.error('Error al cargar estudiantes:', error);
-      alert('Error al cargar estudiantes. Asegúrate de que el UserService esté corriendo en el puerto 54894.');
+      console.error('Error details:', error.response?.data);
+      alert('Error al cargar estudiantes. Asegúrate de que el UserService esté corriendo en el puerto 54894.\nError: ' + (error.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
