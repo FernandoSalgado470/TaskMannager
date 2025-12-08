@@ -9,8 +9,6 @@ const Students = () => {
     firstName: '',
     lastName: '',
     email: '',
-    phoneNumber: '',
-    address: '',
   });
   const [errors, setErrors] = useState({});
 
@@ -75,13 +73,11 @@ const Students = () => {
     }
 
     try {
-      // Para UserService, necesitamos el formato correcto
+      // Para UserService, combinar firstName y lastName en fullName
       const userData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        username: formData.email.split('@')[0], // Generar username del email
         email: formData.email,
-        phoneNumber: formData.phoneNumber || '',
-        address: formData.address || '',
+        fullName: `${formData.firstName} ${formData.lastName}`.trim(),
       };
 
       const response = await fetch('http://localhost:54894/api/users', {
@@ -92,8 +88,10 @@ const Students = () => {
         body: JSON.stringify(userData),
       });
 
-      if (!response.ok) {
-        throw new Error('Error al crear estudiante');
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Error al crear estudiante');
       }
 
       alert('Estudiante creado exitosamente');
@@ -123,8 +121,6 @@ const Students = () => {
       firstName: '',
       lastName: '',
       email: '',
-      phoneNumber: '',
-      address: '',
     });
     setErrors({});
   };
@@ -159,9 +155,9 @@ const Students = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre Completo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
             </tr>
           </thead>
@@ -177,10 +173,10 @@ const Students = () => {
                 <tr key={student.id}>
                   <td className="px-6 py-4 whitespace-nowrap">{student.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium">
-                    {student.firstName} {student.lastName}
+                    {student.fullName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{student.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{student.phoneNumber || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{student.username}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => handleDelete(student.id)}
@@ -243,28 +239,6 @@ const Students = () => {
                   } rounded-md`}
                 />
                 {errors.email && <p className="text-red-600 text-sm">{errors.email}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Teléfono (Opcional)</label>
-                <input
-                  type="text"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Dirección (Opcional)</label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  rows="2"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
               </div>
 
               <div className="flex justify-end space-x-2 mt-6">

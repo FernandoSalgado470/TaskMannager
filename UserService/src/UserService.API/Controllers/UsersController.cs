@@ -29,9 +29,24 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUserById(int id)
     {
         var response = await _userService.GetUserByIdAsync(id);
-        
+
         if (!response.Success)
             return NotFound(response);
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _userService.CreateUserAsync(dto);
+
+        if (!response.Success)
+            return BadRequest(response);
 
         return Ok(response);
     }
