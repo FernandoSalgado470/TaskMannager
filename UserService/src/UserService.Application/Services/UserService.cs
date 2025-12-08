@@ -103,7 +103,7 @@ public class UserService : IUserService
             IsEnabled = true
         };
 
-        var createdUser = await _userRepository.AddAsync(user);
+        var createdUser = await _userRepository.CreateAsync(user);
 
         return new ApiResponse<UserDto>
         {
