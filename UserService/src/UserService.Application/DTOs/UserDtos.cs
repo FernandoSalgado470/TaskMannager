@@ -20,6 +20,14 @@ public class LoginResponseDto
     public UserDto User { get; set; } = null!;
 }
 
+public class CreateUserDto
+{
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public string? Password { get; set; } // Opcional, se generará uno por defecto si no se provee
+}
+
 public class UpdateUserDto
 {
     public string? FullName { get; set; }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = 'http://localhost:5004/api';
 
 const loginServiceAPI = axios.create({
   baseURL: API_URL,
@@ -90,7 +90,19 @@ const loginService = {
 
   // Check if user is authenticated
   isAuthenticated: () => {
-    return !!localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+
+    // Both token and user data must exist
+    if (!token || !user) {
+      // Clean up any partial auth data
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      return false;
+    }
+
+    return true;
   },
 };
 

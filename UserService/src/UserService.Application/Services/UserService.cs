@@ -47,7 +47,7 @@ public class UserService : IUserService
     public async Task<ApiResponse<IEnumerable<UserDto>>> GetAllUsersAsync()
     {
         var users = await _userRepository.GetAllAsync();
-        
+
         var userDtos = users.Select(u => new UserDto
         {
             Id = u.Id,
@@ -64,6 +64,61 @@ public class UserService : IUserService
             Success = true,
             Message = "Usuarios obtenidos exitosamente",
             Data = userDtos
+        };
+    }
+
+    public async Task<ApiResponse<UserDto>> CreateUserAsync(CreateUserDto dto)
+    {
+        // Verificar si el email ya existe
+        var existingUsers = await _userRepository.GetAllAsync();
+        if (existingUsers.Any(u => u.Email == dto.Email))
+        {
+            return new ApiResponse<UserDto>
+            {
+                Success = false,
+                Message = "El email ya está registrado"
+            };
+        }
+
+        // Generar username si no se proporciona (usar parte del email)
+        var username = string.IsNullOrEmpty(dto.Username)
+            ? dto.Email.Split('@')[0]
+            : dto.Username;
+
+        // Generar password por defecto si no se proporciona
+        var password = string.IsNullOrEmpty(dto.Password)
+            ? "DefaultPassword123!"
+            : dto.Password;
+
+        // Hash del password
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+        var user = new Domain.Entities.User
+        {
+            Username = username,
+            Email = dto.Email,
+            FullName = dto.FullName,
+            PasswordHash = passwordHash,
+            CreatedAt = DateTime.UtcNow,
+            IsEnabled = true
+        };
+
+        var createdUser = await _userRepository.CreateAsync(user);
+
+        return new ApiResponse<UserDto>
+        {
+            Success = true,
+            Message = "Usuario creado exitosamente",
+            Data = new UserDto
+            {
+                Id = createdUser.Id,
+                Username = createdUser.Username,
+                Email = createdUser.Email,
+                FullName = createdUser.FullName,
+                CreatedAt = createdUser.CreatedAt,
+                IsEnabled = createdUser.IsEnabled,
+                Roles = new List<string>()
+            }
         };
     }
 
