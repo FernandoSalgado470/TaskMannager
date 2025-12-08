@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import gradesService from '../services/gradesService';
+import academicService from '../services/academicService';
 
 const Grades = () => {
   const [grades, setGrades] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [periods, setPeriods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingGrade, setEditingGrade] = useState(null);
@@ -24,6 +27,8 @@ const Grades = () => {
   useEffect(() => {
     loadGrades();
     loadCategories();
+    loadSubjects();
+    loadPeriods();
   }, []);
 
   const loadGrades = async () => {
@@ -48,6 +53,28 @@ const Grades = () => {
       }
     } catch (error) {
       console.error('Error al cargar categorías:', error);
+    }
+  };
+
+  const loadSubjects = async () => {
+    try {
+      const response = await academicService.getAllSubjects();
+      if (response.success) {
+        setSubjects(response.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar materias:', error);
+    }
+  };
+
+  const loadPeriods = async () => {
+    try {
+      const response = await academicService.getAllPeriods();
+      if (response.success) {
+        setPeriods(response.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar períodos:', error);
     }
   };
 
@@ -265,32 +292,44 @@ const Grades = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">ID Materia</label>
-                  <input
-                    type="number"
+                  <label className="block text-sm font-medium text-gray-700">Materia</label>
+                  <select
                     name="subjectId"
                     value={formData.subjectId}
                     onChange={handleChange}
                     className={`mt-1 block w-full px-3 py-2 border ${
                       errors.subjectId ? 'border-red-300' : 'border-gray-300'
                     } rounded-md`}
-                  />
+                  >
+                    <option value="">Selecciona una materia</option>
+                    {subjects.map((subject) => (
+                      <option key={subject.id} value={subject.id}>
+                        {subject.name} ({subject.code})
+                      </option>
+                    ))}
+                  </select>
                   {errors.subjectId && <p className="text-red-600 text-sm">{errors.subjectId}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">ID Período</label>
-                  <input
-                    type="number"
+                  <label className="block text-sm font-medium text-gray-700">Período Académico</label>
+                  <select
                     name="academicPeriodId"
                     value={formData.academicPeriodId}
                     onChange={handleChange}
                     className={`mt-1 block w-full px-3 py-2 border ${
                       errors.academicPeriodId ? 'border-red-300' : 'border-gray-300'
                     } rounded-md`}
-                  />
+                  >
+                    <option value="">Selecciona un período</option>
+                    {periods.map((period) => (
+                      <option key={period.id} value={period.id}>
+                        {period.name}
+                      </option>
+                    ))}
+                  </select>
                   {errors.academicPeriodId && <p className="text-red-600 text-sm">{errors.academicPeriodId}</p>}
                 </div>
 
