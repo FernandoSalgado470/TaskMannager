@@ -4,7 +4,10 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Subjects from "./pages/Subjects";
 import Groups from "./pages/Groups";
-import Notes from "./pages/Notes"; // 👈 nueva página
+import Notes from "./pages/Notes";
+import Grades from "./pages/Grades";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
 
 function App() {
   return (
@@ -15,7 +18,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/subjects" element={<Subjects />} />
           <Route path="/groups" element={<Groups />} />
-          <Route path="/notes" element={<Notes />} /> {/* 👈 nueva ruta */}
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/grades" element={<Grades />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </div>
     </Router>
