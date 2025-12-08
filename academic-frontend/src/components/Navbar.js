@@ -68,6 +68,17 @@ const Navbar = () => {
             Grupos
           </Link>
 
+          <Link
+            to="/students"
+            style={{
+              color: "white",
+              textDecoration: "none",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.5rem",
+            }}
+          >
+            Estudiantes
+          </Link>
 
           <Link
             to="/notes"

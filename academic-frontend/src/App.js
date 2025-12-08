@@ -6,6 +6,7 @@ import Subjects from "./pages/Subjects";
 import Groups from "./pages/Groups";
 import Notes from "./pages/Notes";
 import Grades from "./pages/Grades";
+import Students from "./pages/Students";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/groups" element={<Groups />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/grades" element={<Grades />} />
+          <Route path="/students" element={<Students />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>
