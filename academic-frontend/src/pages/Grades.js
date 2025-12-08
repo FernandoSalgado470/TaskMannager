@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import gradesService from '../services/gradesService';
 import academicService from '../services/academicService';
+import userService from '../services/userService';
 
 const Grades = () => {
   const [grades, setGrades] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [periods, setPeriods] = useState([]);
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingGrade, setEditingGrade] = useState(null);
@@ -29,6 +31,7 @@ const Grades = () => {
     loadCategories();
     loadSubjects();
     loadPeriods();
+    loadStudents();
   }, []);
 
   const loadGrades = async () => {
@@ -76,6 +79,22 @@ const Grades = () => {
     } catch (error) {
       console.error('Error al cargar períodos:', error);
     }
+  };
+
+  const loadStudents = async () => {
+    try {
+      const response = await userService.getAllUsers();
+      if (response.success) {
+        setStudents(response.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar estudiantes:', error);
+    }
+  };
+
+  const getStudentName = (studentId) => {
+    const student = students.find(s => s.id === studentId);
+    return student ? `${student.firstName} ${student.lastName}` : `ID: ${studentId}`;
   };
 
   const handleChange = (e) => {
@@ -211,7 +230,7 @@ const Grades = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID Estudiante</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estudiante</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoría</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Calificación</th>
@@ -230,7 +249,7 @@ const Grades = () => {
             ) : (
               grades.map((grade) => (
                 <tr key={grade.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{grade.studentId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{getStudentName(grade.studentId)}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium">{grade.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {grade.gradeCategory?.name || 'Sin categoría'}
@@ -278,16 +297,22 @@ const Grades = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">ID Estudiante</label>
-                  <input
-                    type="number"
+                  <label className="block text-sm font-medium text-gray-700">Estudiante</label>
+                  <select
                     name="studentId"
                     value={formData.studentId}
                     onChange={handleChange}
                     className={`mt-1 block w-full px-3 py-2 border ${
                       errors.studentId ? 'border-red-300' : 'border-gray-300'
                     } rounded-md`}
-                  />
+                  >
+                    <option value="">Selecciona un estudiante</option>
+                    {students.map((student) => (
+                      <option key={student.id} value={student.id}>
+                        {student.firstName} {student.lastName}
+                      </option>
+                    ))}
+                  </select>
                   {errors.studentId && <p className="text-red-600 text-sm">{errors.studentId}</p>}
                 </div>
 
