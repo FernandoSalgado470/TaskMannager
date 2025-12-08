@@ -33,7 +33,7 @@ const Navbar = () => {
 
         <div style={{ display: "flex", gap: "1rem" }}>
           <Link
-            to="/"
+            to="/home"
             style={{
               color: "white",
               textDecoration: "none",
@@ -68,7 +68,7 @@ const Navbar = () => {
             Grupos
           </Link>
 
-         
+
           <Link
             to="/notes"
             style={{
@@ -79,6 +79,30 @@ const Navbar = () => {
             }}
           >
             Notas
+          </Link>
+
+          <Link
+            to="/grades"
+            style={{
+              color: "white",
+              textDecoration: "none",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.5rem",
+            }}
+          >
+            Calificaciones
+          </Link>
+
+          <Link
+            to="/login"
+            style={{
+              color: "white",
+              textDecoration: "none",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.5rem",
+            }}
+          >
+            Login
           </Link>
         </div>
       </div>
