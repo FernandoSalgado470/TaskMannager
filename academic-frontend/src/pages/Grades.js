@@ -94,7 +94,7 @@ const Grades = () => {
 
   const getStudentName = (studentId) => {
     const student = students.find(s => s.id === studentId);
-    return student ? `${student.firstName} ${student.lastName}` : `ID: ${studentId}`;
+    return student ? student.fullName : `ID: ${studentId}`;
   };
 
   const handleChange = (e) => {
@@ -309,7 +309,7 @@ const Grades = () => {
                     <option value="">Selecciona un estudiante</option>
                     {students.map((student) => (
                       <option key={student.id} value={student.id}>
-                        {student.firstName} {student.lastName}
+                        {student.fullName}
                       </option>
                     ))}
                   </select>
