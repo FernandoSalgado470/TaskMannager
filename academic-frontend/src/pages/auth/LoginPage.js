@@ -49,7 +49,7 @@ const LoginPage = () => {
     try {
       const response = await loginService.login(formData.email, formData.password);
       if (response.success) {
-        navigate('/');
+        navigate('/home');
       } else {
         setApiError(response.message || 'Error al iniciar sesión');
       }

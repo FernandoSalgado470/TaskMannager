@@ -33,7 +33,7 @@ const Navbar = () => {
 
         <div style={{ display: "flex", gap: "1rem" }}>
           <Link
-            to="/"
+            to="/home"
             style={{
               color: "white",
               textDecoration: "none",
