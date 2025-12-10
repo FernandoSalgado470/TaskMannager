@@ -11,23 +11,71 @@ function Register() {
     fullName: '',
   });
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Limpiar error del campo cuando el usuario escribe
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    // Validar nombre completo
+    if (!formData.fullName.trim()) {
+      errors.fullName = 'El nombre completo es requerido';
+    }
+
+    // Validar username
+    if (!formData.username.trim()) {
+      errors.username = 'El nombre de usuario es requerido';
+    } else if (formData.username.length < 3) {
+      errors.username = 'El nombre de usuario debe tener al menos 3 caracteres';
+    }
+
+    // Validar email
+    if (!formData.email.trim()) {
+      errors.email = 'El email es requerido';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'El email no es válido';
+    }
+
+    // Validar contraseña
+    if (!formData.password) {
+      errors.password = 'La contraseña es requerida';
+    } else if (formData.password.length < 6) {
+      errors.password = 'La contraseña debe tener al menos 6 caracteres';
+    }
+
+    // Validar confirmación de contraseña
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = 'La confirmación de contraseña es requerida';
+    } else if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+    // Validar el formulario
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -71,12 +119,16 @@ function Register() {
                 id="fullName"
                 name="fullName"
                 type="text"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  fieldErrors.fullName ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                 placeholder="John Doe"
                 value={formData.fullName}
                 onChange={handleChange}
               />
+              {fieldErrors.fullName && (
+                <p className="text-red-600 text-sm mt-1">{fieldErrors.fullName}</p>
+              )}
             </div>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -86,12 +138,16 @@ function Register() {
                 id="username"
                 name="username"
                 type="text"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  fieldErrors.username ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                 placeholder="johndoe"
                 value={formData.username}
                 onChange={handleChange}
               />
+              {fieldErrors.username && (
+                <p className="text-red-600 text-sm mt-1">{fieldErrors.username}</p>
+              )}
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -101,12 +157,16 @@ function Register() {
                 id="email"
                 name="email"
                 type="email"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  fieldErrors.email ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                 placeholder="john@example.com"
                 value={formData.email}
                 onChange={handleChange}
               />
+              {fieldErrors.email && (
+                <p className="text-red-600 text-sm mt-1">{fieldErrors.email}</p>
+              )}
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -116,12 +176,16 @@ function Register() {
                 id="password"
                 name="password"
                 type="password"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  fieldErrors.password ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
               />
+              {fieldErrors.password && (
+                <p className="text-red-600 text-sm mt-1">{fieldErrors.password}</p>
+              )}
             </div>
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
@@ -131,12 +195,16 @@ function Register() {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
+                  fieldErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                 placeholder="••••••••"
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
+              {fieldErrors.confirmPassword && (
+                <p className="text-red-600 text-sm mt-1">{fieldErrors.confirmPassword}</p>
+              )}
             </div>
           </div>
 
