@@ -99,6 +99,15 @@ const Grades = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Validación especial para campos numéricos (score y maxScore)
+    if (name === 'score' || name === 'maxScore') {
+      // Permitir campo vacío o números válidos con decimales
+      if (value !== '' && !/^\d*\.?\d*$/.test(value)) {
+        return; // No actualizar si contiene caracteres no numéricos
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
@@ -107,14 +116,39 @@ const Grades = () => {
 
   const validate = () => {
     const newErrors = {};
+
+    // Validaciones de campos requeridos
     if (!formData.studentId) newErrors.studentId = 'El ID del estudiante es requerido';
     if (!formData.subjectId) newErrors.subjectId = 'El ID de la materia es requerido';
     if (!formData.academicPeriodId) newErrors.academicPeriodId = 'El ID del período es requerido';
     if (!formData.title) newErrors.title = 'El título es requerido';
-    if (!formData.score) newErrors.score = 'La calificación es requerida';
-    if (parseFloat(formData.score) > parseFloat(formData.maxScore)) {
+    if (!formData.score && formData.score !== 0) newErrors.score = 'La calificación es requerida';
+    if (!formData.maxScore) newErrors.maxScore = 'La calificación máxima es requerida';
+
+    // Validaciones de formato numérico
+    if (formData.score && !/^\d*\.?\d+$/.test(formData.score)) {
+      newErrors.score = 'La calificación debe ser un número válido';
+    }
+    if (formData.maxScore && !/^\d*\.?\d+$/.test(formData.maxScore)) {
+      newErrors.maxScore = 'La calificación máxima debe ser un número válido';
+    }
+
+    // Validaciones de rangos numéricos
+    const score = parseFloat(formData.score);
+    const maxScore = parseFloat(formData.maxScore);
+
+    if (!isNaN(score) && score < 0) {
+      newErrors.score = 'La calificación no puede ser negativa';
+    }
+
+    if (!isNaN(maxScore) && maxScore <= 0) {
+      newErrors.maxScore = 'La calificación máxima debe ser mayor a 0';
+    }
+
+    if (!isNaN(score) && !isNaN(maxScore) && score > maxScore) {
       newErrors.score = 'La calificación no puede ser mayor a la calificación máxima';
     }
+
     return newErrors;
   };
 
@@ -425,8 +459,11 @@ const Grades = () => {
                     name="maxScore"
                     value={formData.maxScore}
                     onChange={handleChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    className={`mt-1 block w-full px-3 py-2 border ${
+                      errors.maxScore ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md`}
                   />
+                  {errors.maxScore && <p className="text-red-600 text-sm">{errors.maxScore}</p>}
                 </div>
 
                 <div>
